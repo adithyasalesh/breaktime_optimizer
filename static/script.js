@@ -93,8 +93,7 @@ function showNotification(icon, message) {
     // Browser notification (with permission)
     if ('Notification' in window && Notification.permission === 'granted') {
         new Notification(icon + ' Study Break Optimizer', {
-            body: message,
-            icon: '📚'
+            body: message
         });
     }
     
