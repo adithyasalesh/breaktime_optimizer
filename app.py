@@ -209,7 +209,7 @@ def get_recommendation():
 @app.route('/api/train', methods=['POST'])
 def train_agent():
     """Start or stop training the agent."""
-    global training_state
+    global training_state, state
     
     data = request.get_json()
     episodes = data.get('episodes', 100)
@@ -238,6 +238,8 @@ def train_agent():
         training_state['current_reward'] = total_reward
     
     training_state['is_training'] = False
+    state = env.reset()
+    training_state['current_reward'] = 0
     return jsonify(training_state)
 
 
