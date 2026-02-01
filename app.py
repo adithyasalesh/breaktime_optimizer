@@ -50,6 +50,54 @@ session_history = {
     'action_counts': {0: 0, 1: 0, 2: 0}  # Continue, Short Break, Long Break
 }
 
+
+def _get_history_path():
+    explicit = os.getenv('DATA_PATH')
+    if explicit:
+        return explicit
+    if os.getenv('VERCEL'):
+        return '/tmp/session_history.json'
+    return os.path.join(os.path.dirname(__file__), 'session_history.json')
+
+
+def _load_session_history():
+    global session_history
+    path = _get_history_path()
+    if not os.path.exists(path):
+        return
+    try:
+        with open(path, 'r', encoding='utf-8') as file:
+            data = json.load(file)
+        action_counts = data.get('action_counts', {0: 0, 1: 0, 2: 0})
+        if isinstance(action_counts, dict):
+            action_counts = {int(k): int(v) for k, v in action_counts.items()}
+        session_history = {
+            'total_sessions': int(data.get('total_sessions', 0)),
+            'total_study_time': int(data.get('total_study_time', 0)),
+            'sessions': data.get('sessions', []),
+            'action_counts': {
+                0: action_counts.get(0, 0),
+                1: action_counts.get(1, 0),
+                2: action_counts.get(2, 0)
+            }
+        }
+    except Exception:
+        return
+
+
+def _save_session_history():
+    path = _get_history_path()
+    folder = os.path.dirname(path)
+    if folder:
+        os.makedirs(folder, exist_ok=True)
+    try:
+        with open(path, 'w', encoding='utf-8') as file:
+            json.dump(session_history, file)
+    except Exception:
+        return
+
+_load_session_history()
+
 # Action mappings
 ACTIONS = {
     0: {'name': 'Continue Studying', 'description': 'Keep studying for 10 more minutes', 'icon': '📚'},
@@ -123,6 +171,7 @@ def take_action():
     
     # Track action
     session_history['action_counts'][action] += 1
+    _save_session_history()
     
     # Execute action
     next_state, reward, done = env.step(action)
@@ -213,6 +262,7 @@ def reset_session():
             'study_time': env.study_time,
             'reward': training_state['current_reward']
         })
+        _save_session_history()
     
     state = env.reset()
     training_state['current_reward'] = 0
