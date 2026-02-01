@@ -317,8 +317,8 @@ def get_learning_stats():
     else:
         avg_reward = 0
     
-    # Recent sessions (last 10)
-    recent_sessions = session_history['sessions'][-10:]
+    # Sessions (all)
+    recent_sessions = session_history['sessions']
     recent_sessions_formatted = []
     for session in recent_sessions:
         from datetime import datetime
