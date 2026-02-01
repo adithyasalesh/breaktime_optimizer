@@ -1,0 +1,319 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Study Break Optimizer - AI-Powered Learning</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+</head>
+<body>
+    <!-- Navigation -->
+    <nav class="navbar">
+        <div class="nav-container">
+            <div class="nav-logo">📚 Study Break Optimizer</div>
+            <div class="nav-links">
+                <button class="nav-btn" onclick="goToPage('home')">Home</button>
+                <button class="nav-btn" onclick="goToPage('statistics')">📊 Statistics</button>
+                <button class="nav-btn" onclick="goToPage('monitor')">Monitor</button>
+            </div>
+        </div>
+    </nav>
+
+    <!-- Home Page -->
+    <div id="home-page" class="page active">
+        <section class="hero">
+            <div class="hero-content">
+                <div class="hero-icon">📖</div>
+                <h1>Study Break Optimizer</h1>
+                <p class="subtitle">Reinforcement Learning-Powered Study Management</p>
+                <p class="description">Optimize your study sessions with intelligent break recommendations</p>
+                
+                <div class="features">
+                    <div class="feature-card">
+                        <div class="feature-icon">💡</div>
+                        <h3>AI-Powered</h3>
+                        <p>Uses Q-Learning to adapt to your study patterns and optimize break timing</p>
+                    </div>
+                    <div class="feature-card">
+                        <div class="feature-icon">📊</div>
+                        <h3>Data-Driven</h3>
+                        <p>Track your progress and see how the AI learns from your study habits</p>
+                    </div>
+                    <div class="feature-card">
+                        <div class="feature-icon">⚡</div>
+                        <h3>Productivity</h3>
+                        <p>Maximize focus and retention by taking breaks at the optimal moments</p>
+                    </div>
+                </div>
+
+                <button class="btn btn-primary btn-lg" onclick="goToPage('how-it-works')">Get Started</button>
+            </div>
+        </section>
+    </div>
+
+    <!-- How It Works Page -->
+    <div id="how-it-works-page" class="page">
+        <section class="how-it-works">
+            <div class="page-header">
+                <button class="btn-back" onclick="goToPage('home')">← Back</button>
+                <h1>How It Works</h1>
+            </div>
+
+            <div class="steps-container">
+                <div class="step">
+                    <div class="step-number">1</div>
+                    <div>
+                        <h3>Start Your Session</h3>
+                        <p>Begin your study session and click "Next Step" to progress through 10-minute intervals. The AI agent monitors your study time and fatigue levels.</p>
+                    </div>
+                </div>
+
+                <div class="step">
+                    <div class="step-number">2</div>
+                    <div>
+                        <h3>Follow AI Recommendations</h3>
+                        <p>The Q-Learning agent analyzes your current state and suggests the optimal action: continue studying, take a short break, or take a long break.</p>
+                    </div>
+                </div>
+
+                <div class="step">
+                    <div class="step-number">3</div>
+                    <div>
+                        <h3>Track Your Progress</h3>
+                        <p>Watch the fatigue indicator and study time update dynamically. Sessions automatically reset after 120 minutes, allowing the AI to continuously learn.</p>
+                    </div>
+                </div>
+            </div>
+
+            <div class="understanding-actions">
+                <h2>Understanding Actions</h2>
+                <div class="actions-grid">
+                    <div class="action-box">
+                        <div class="action-icon">📚</div>
+                        <h4>Continue</h4>
+                        <p>Keep studying</p>
+                    </div>
+                    <div class="action-box">
+                        <div class="action-icon">☕</div>
+                        <h4>Short Break</h4>
+                        <p>5-10 minutes</p>
+                    </div>
+                    <div class="action-box">
+                        <div class="action-icon">😴</div>
+                        <h4>Long Break</h4>
+                        <p>15-30 minutes</p>
+                    </div>
+                </div>
+            </div>
+
+            <button class="btn btn-primary btn-lg" onclick="goToPage('monitor')">Start Session →</button>
+        </section>
+    </div>
+
+    <!-- Session Monitor Page -->
+    <div id="monitor-page" class="page">
+        <section class="monitor">
+            <div class="page-header">
+                <button class="btn-back" onclick="goToPage('home')">← Back</button>
+                <h1>Study Session Monitor</h1>
+                <button class="btn btn-stats" onclick="toggleStatistics()">📊 View Statistics</button>
+            </div>
+
+            <!-- Session Settings -->
+            <div class="session-settings">
+                <div class="setting-group">
+                    <label for="session-goal">📋 Daily Study Goal (minutes):</label>
+                    <div class="setting-input-group">
+                        <input type="number" id="session-goal" value="120" min="30" max="480">
+                        <button class="btn btn-small" onclick="updateSessionGoal()">Set Goal</button>
+                    </div>
+                </div>
+                <div class="goal-progress">
+                    <div class="progress-label">Progress to Goal</div>
+                    <div class="progress-bar-goal">
+                        <div id="progress-bar-fill" class="progress-fill-goal"></div>
+                    </div>
+                    <div class="progress-text"><span id="current-progress">0</span> / <span id="goal-target">120</span> min</div>
+                </div>
+
+                <div class="preference-settings">
+                    <div class="pref-row">
+                        <div class="pref-group">
+                            <label for="fatigue-pref">🧠 Fatigue Sensitivity</label>
+                            <select id="fatigue-pref">
+                                <option value="low">Low</option>
+                                <option value="medium" selected>Medium</option>
+                                <option value="high">High</option>
+                            </select>
+                        </div>
+                        <div class="pref-group">
+                            <label for="break-bias">☕ Break Bias</label>
+                            <select id="break-bias">
+                                <option value="study">Prefer Studying</option>
+                                <option value="short">Prefer Short Breaks</option>
+                                <option value="long">Prefer Long Breaks</option>
+                            </select>
+                        </div>
+                    </div>
+                    <button class="btn btn-small" onclick="savePreferences()">Save Preferences</button>
+                    <div class="pref-hint">These preferences tune the AI policy for your style.</div>
+                </div>
+            </div>
+
+            <!-- Current Stats -->
+            <div class="monitor-stats">
+                <div class="stat-card blue">
+                    <label>Study Time</label>
+                    <div class="stat-value" id="monitor-study-time">0</div>
+                    <div class="stat-unit">min</div>
+                </div>
+                <div class="stat-card orange">
+                    <label>Fatigue Level</label>
+                    <div class="stat-value" id="monitor-fatigue-level">0</div>
+                    <div class="stat-unit">/ 9</div>
+                </div>
+                <div class="stat-card green">
+                    <label>Total Reward</label>
+                    <div class="stat-value" id="monitor-reward">0</div>
+                    <div class="stat-unit" id="monitor-steps">Step 0</div>
+                </div>
+            </div>
+
+            <!-- AI Recommendation Card -->
+            <div class="recommendation-section">
+                <h2>🤖 AI Recommendation</h2>
+                <div class="recommendation-card">
+                    <div class="recommendation-icon" id="rec-icon">📚</div>
+                    <h3 id="rec-action">Continue Studying</h3>
+                    <p id="rec-description">Keep working - your fatigue is low</p>
+                </div>
+            </div>
+
+            <!-- Action Button -->
+            <div class="action-section">
+                <button class="btn btn-primary btn-xl" id="next-step-btn" onclick="takeAction()">▶ Next Step</button>
+            </div>
+
+            <!-- Statistics Panel (Hidden by default) -->
+            <div id="statistics-panel" class="statistics-panel hidden">
+                <h2>📈 Training Statistics</h2>
+                <div class="stats-grid-advanced">
+                    <div class="stat-box">
+                        <label>Average Reward</label>
+                        <span id="avg-reward" class="stat-value">-</span>
+                    </div>
+                    <div class="stat-box">
+                        <label>Best Episode</label>
+                        <span id="max-reward" class="stat-value">-</span>
+                    </div>
+                    <div class="stat-box">
+                        <label>Episodes Trained</label>
+                        <span id="episodes-trained" class="stat-value">0</span>
+                    </div>
+                </div>
+                <div class="chart-container">
+                    <canvas id="rewardsChart"></canvas>
+                </div>
+
+                <div class="training-section">
+                    <h3>Train Agent</h3>
+                    <div class="training-controls">
+                        <div class="form-group">
+                            <label for="episodes">Episodes:</label>
+                            <input type="number" id="episodes" value="100" min="10" max="1000">
+                        </div>
+                        <button id="train-btn" class="btn btn-primary" onclick="startTraining()">Start Training</button>
+                    </div>
+                    <div id="training-progress" class="hidden">
+                        <p id="training-status">Training...</p>
+                        <div class="progress-bar">
+                            <div id="progress-fill" class="progress-fill"></div>
+                        </div>
+                    </div>
+                </div>
+
+                <button class="btn btn-secondary" onclick="toggleStatistics()">Hide Statistics</button>
+            </div>
+
+            <button class="btn btn-secondary btn-full" onclick="resetSession()">Reset Session</button>
+        </section>
+    </div>
+
+    <!-- Statistics Page -->
+    <div id="statistics-page" class="page">
+        <section class="statistics">
+            <div class="page-header">
+                <h1>📈 Learning Statistics</h1>
+            </div>
+
+            <!-- Top Stats -->
+            <div class="stats-top">
+                <div class="stat-card blue">
+                    <label>Total Sessions</label>
+                    <div class="stat-value" id="total-sessions">0</div>
+                </div>
+                <div class="stat-card green">
+                    <label>Avg Reward</label>
+                    <div class="stat-value" id="avg-reward-display">0.0</div>
+                </div>
+                <div class="stat-card orange">
+                    <label>Total Study Time</label>
+                    <div class="stat-value" id="total-study-time">0</div>
+                    <div class="stat-unit">minutes</div>
+                </div>
+            </div>
+
+            <!-- Action Distribution -->
+            <div class="distribution-section">
+                <h2>Action Distribution</h2>
+                <div class="action-distribution">
+                    <div class="action-stat blue">
+                        <div class="action-icon">📚</div>
+                        <h4>Continue</h4>
+                        <div class="percentage" id="action-0-percent">0%</div>
+                        <div class="count" id="action-0-count">0 times</div>
+                    </div>
+                    <div class="action-stat yellow">
+                        <div class="action-icon">☕</div>
+                        <h4>Short Break</h4>
+                        <div class="percentage" id="action-1-percent">0%</div>
+                        <div class="count" id="action-1-count">0 times</div>
+                    </div>
+                    <div class="action-stat red">
+                        <div class="action-icon">😴</div>
+                        <h4>Long Break</h4>
+                        <div class="percentage" id="action-2-percent">0%</div>
+                        <div class="count" id="action-2-count">0 times</div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Recent Sessions -->
+            <div class="recent-sessions-section">
+                <h2>Recent Sessions</h2>
+                <div class="table-container">
+                    <table class="sessions-table">
+                        <thead>
+                            <tr>
+                                <th>Date</th>
+                                <th>Study Time</th>
+                                <th>Reward</th>
+                            </tr>
+                        </thead>
+                        <tbody id="sessions-tbody">
+                            <tr>
+                                <td colspan="3" class="no-data">No sessions yet. Start studying!</td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+
+            <button class="btn btn-back-full" onclick="goToPage('home')">← Back</button>
+        </section>
+    </div>
+
+    <script src="{{ url_for('static', filename='script.js') }}"></script>
+</body>
+</html>
