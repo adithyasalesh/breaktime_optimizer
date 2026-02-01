@@ -1,5 +1,5 @@
 
-from flask import Flask, render_template, jsonify, request
+from flask import Flask, render_template, jsonify, request, session
 from environment import StudyEnvironment
 from q_learning_agent import QLearningAgent
 import json
@@ -7,6 +7,7 @@ import os
 import numpy as np
 
 app = Flask(__name__)
+app.secret_key = os.getenv('SECRET_KEY', 'dev-secret')
 
 # Custom JSON encoder to handle numpy types
 class NumpyEncoder(json.JSONEncoder):
@@ -98,6 +99,28 @@ def _save_session_history():
 
 _load_session_history()
 
+
+def _load_env_from_session():
+    global state
+    if 'study_time' not in session:
+        _save_env_to_session()
+        return
+    env.study_time = int(session.get('study_time', 0))
+    env.fatigue = int(session.get('fatigue', 0))
+    env.set_preferences(
+        session.get('fatigue_sensitivity', PREFERENCE_DEFAULTS['fatigue_sensitivity']),
+        session.get('break_bias', PREFERENCE_DEFAULTS['break_bias'])
+    )
+    state = env.get_state()
+
+
+def _save_env_to_session():
+    session['study_time'] = int(env.study_time)
+    session['fatigue'] = int(env.fatigue)
+    session['fatigue_sensitivity'] = env.fatigue_pref
+    session['break_bias'] = env.break_bias
+    session.modified = True
+
 # Action mappings
 ACTIONS = {
     0: {'name': 'Continue Studying', 'description': 'Keep studying for 10 more minutes', 'icon': '📚'},
@@ -121,6 +144,7 @@ def index():
 @app.route('/api/status')
 def get_status():
     """Get current study session status."""
+    _load_env_from_session()
     return jsonify({
         'study_time': int(env.study_time),
         'fatigue': int(env.fatigue),
@@ -133,6 +157,7 @@ def get_status():
 def preferences():
     """Get or update user preference configuration."""
     global state
+    _load_env_from_session()
     if request.method == 'GET':
         return jsonify({
             'fatigue_sensitivity': env.fatigue_pref,
@@ -151,6 +176,7 @@ def preferences():
 
     env.set_preferences(fatigue_pref, break_bias)
     state = env.get_state()
+    _save_env_to_session()
     return jsonify({
         'fatigue_sensitivity': fatigue_pref,
         'break_bias': break_bias,
@@ -162,6 +188,7 @@ def preferences():
 def take_action():
     """Execute an action and get the next recommendation."""
     global state
+    _load_env_from_session()
     
     data = request.get_json()
     action = data.get('action', 0)
@@ -179,6 +206,7 @@ def take_action():
     # Update agent
     agent.update(state, action, reward, next_state)
     state = next_state
+    _save_env_to_session()
     
     # Track reward for current session
     training_state['current_reward'] += reward
@@ -197,6 +225,7 @@ def take_action():
 @app.route('/api/recommendation')
 def get_recommendation():
     """Get AI-recommended action based on current state."""
+    _load_env_from_session()
     action = int(agent.choose_action(state))
     return jsonify({
         'recommended_action': action,
@@ -253,6 +282,7 @@ def get_training_status():
 def reset_session():
     """Reset the study session."""
     global state, env
+    _load_env_from_session()
     
     # Record session
     if env.study_time > 0:
@@ -268,6 +298,7 @@ def reset_session():
     
     state = env.reset()
     training_state['current_reward'] = 0
+    _save_env_to_session()
     
     return jsonify({
         'message': 'Session reset',
