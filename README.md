@@ -185,7 +185,7 @@ CMD ["gunicorn", "app:app", "--bind", "0.0.0.0:5000"]
 
 ## 📝 License
 
-This project is open source and available for educational use.
+This project is proprietary and strictly belongs to the author. All rights reserved. No use, reproduction, modification, or distribution is permitted without explicit written permission.
 
 ## 👨‍💻 Author
 
