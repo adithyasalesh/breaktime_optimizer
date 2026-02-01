@@ -8,9 +8,38 @@ let lastNotificationTime = 0;
 let fatiguePref = 'medium';
 let breakBias = 'study';
 let currentRecommendation = null;
+let localSessions = [];
+
+/**
+ * Load session history from localStorage
+ */
+function loadLocalSessions() {
+    const stored = localStorage.getItem('studyBreakSessions');
+    if (stored) {
+        try {
+            localSessions = JSON.parse(stored);
+        } catch (e) {
+            localSessions = [];
+        }
+    }
+}
+
+/**
+ * Save session to localStorage
+ */
+function saveSessionLocally(studyTime, reward) {
+    const now = new Date();
+    localSessions.push({
+        date: now.toLocaleString(),
+        study_time: studyTime,
+        reward: Math.round(reward * 100) / 100
+    });
+    localStorage.setItem('studyBreakSessions', JSON.stringify(localSessions));
+}
 
 // Initialize on page load
 document.addEventListener('DOMContentLoaded', () => {
+    loadLocalSessions();
     goToPage('home');
 });
 
@@ -251,6 +280,7 @@ async function takeAction() {
 
         if (data.done) {
             showNotification('✅', 'Session completed! Reward: ' + currentReward);
+            saveSessionLocally(data.study_time, currentReward);
             alert(`Session completed! Final reward: ${currentReward}\nClick Next Step to start a new session.`);
             stepCount = 0;
             currentReward = 0;
@@ -450,10 +480,11 @@ async function loadLearningStats() {
 
         // Update recent sessions table
         const tbody = document.getElementById('sessions-tbody');
-        if (data.recent_sessions.length === 0) {
+        const allSessions = [...data.recent_sessions, ...localSessions].sort((a, b) => new Date(b.date) - new Date(a.date));
+        if (allSessions.length === 0) {
             tbody.innerHTML = '<tr><td colspan="3" class="no-data">No sessions yet. Start studying!</td></tr>';
         } else {
-            tbody.innerHTML = data.recent_sessions.map(session => `
+            tbody.innerHTML = allSessions.map(session => `
                 <tr>
                     <td>${session.date}</td>
                     <td>${session.study_time} min</td>
